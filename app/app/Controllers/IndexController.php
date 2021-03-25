@@ -11,4 +11,9 @@ class IndexController
 
         return ['message'=>'hello world','queryParams' => $test];
     }
+
+    public function test(): array
+    {
+        return ['test' => 'test'];
+    }
 }

@@ -1,21 +1,21 @@
 <?php
+namespace Routes;
 
-use Laminas\Diactoros\ResponseFactory;
-use League\Route\Router;
-use League\Route\Strategy\JsonStrategy;
+use Routes\Adapters\LeagueRouteAdapter;
+use Symfony\Component\Yaml\Yaml;
 
-$request = Laminas\Diactoros\ServerRequestFactory::fromGlobals(
-    $_SERVER, $_GET, $_POST, $_COOKIE, $_FILES
-);
+class Router {
 
-$responseFactory = new ResponseFactory();
+    private array $routes;
 
-$strategy = new JsonStrategy($responseFactory);
-$router   = (new Router)->setStrategy($strategy);
+    public function __construct()
+    {
+        $this->routes = Yaml::parseFile(dirname(__DIR__, 1) . $_ENV['ROUTES_PATH']);
+    }
 
-// здесь прописываются роуты
-$router->map('GET', '/', 'App\Controllers\IndexController::index');
-
-$response = $router->dispatch($request);
-
-(new Laminas\HttpHandlerRunner\Emitter\SapiEmitter)->emit($response);
+    public function create()
+    {
+        $router = new LeagueRouteAdapter($this->routes);
+        $router->createRoutes();
+    }
+}
